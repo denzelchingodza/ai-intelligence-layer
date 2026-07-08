@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: ai-intelligence-layer
+    runtime: docker
+    plan: free
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: SENTINEL_API_URL
+        sync: false
+      - key: STACKSCOPE_API_URL
+        sync: false
+      - key: DOCUZEN_API_URL
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
