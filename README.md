@@ -1,44 +1,28 @@
 # AI Intelligence Layer
 
-A natural language query interface over multiple project APIs. Ask a question in plain English the AI determines which service to query and returns a plain-text answer.
+A personal AI query interface that sits on top of my projects. Instead of navigating dashboards or calling APIs manually, I can ask a plain English question and get a direct answer.
 
-## What it does
+## The idea
 
-Routes natural language questions to the right backend connector using GPT4o-mini. Currently supports:
+I built multiple tools a monitoring service (Sentinel) and a job market tracker (StackScope) and wanted a single place to query all of them without thinking about which API to hit or what format the response is in. This is that layer.
 
-- **Sentinel** — service uptime, alerts, and health checks
-- **StackScope** — developer job trends, skill demand, and salary data
+## How it works
 
-## API
+A question comes in. GPT4o-mini classifies the intent and routes it to the right connector. The connector calls the relevant internal API, and the model summarises the result into a plain text answer.
 
-**POST** `/query`
-
-```json
-{ "question": "What skills are trending up this month?" }
+```
+"Are any of my services down?"
+        ↓
+   GPT-4o-mini
+        ↓
+   Sentinel connector → uptime data
+        ↓
+   "All services are up. Last incident was 4 days ago."
 ```
 
-```json
-{
-  "source": "stackscope",
-  "answer": "TypeScript and Kubernetes are trending up.",
-  "metadata": {}
-}
-```
+## Built with
 
-Rate limited to 10 requests/hour.
-
-## Stack
-
-FastAPI · OpenAI GPT4o-mini · Render (API) · Vercel (frontend)
-
-## Setup
-
-```bash
-pip install -r requirements.txt
-OPENAI_API_KEY=sk-... uvicorn app.main:app --reload
-```
-
-**Required env vars:** `OPENAI_API_KEY`, `SENTINEL_API_URL`, `SENTINEL_COGNITO_TOKEN`
+FastAPI · OpenAI GPT4o-mini · Python · Render · Vercel
 
 ---
 
