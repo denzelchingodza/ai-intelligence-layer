@@ -1,29 +1,86 @@
 # AI Intelligence Layer
 
-A personal AI query interface that sits on top of my projects. Instead of navigating dashboards or calling APIs manually, I can ask a plain English question and get a direct answer.
+A natural language interface across my personal projects. Ask a plain English question, get a plain text answer.
 
-## The idea
-
-I built multiple tools a monitoring service (Sentinel) and a job market tracker (StackScope) and wanted a single place to query all of them without thinking about which API to hit or what format the response is in. This is that layer.
-
-## How it works
-
-A question comes in. GPT4o-mini classifies the intent and routes it to the right connector. The connector calls the relevant internal API, and the model summarises the result into a plain text answer.
-
-```
-"Are any of my services down?"
-        ↓
-   GPT-4o-mini
-        ↓
-   Sentinel connector → uptime data
-        ↓
-   "All services are up. Last incident was 4 days ago."
-```
-
-## Built with
-
-FastAPI · OpenAI GPT4o-mini · Python · Render · Vercel
+![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=flat&logo=fastapi)
+![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=flat&logo=openai&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
+![Render](https://img.shields.io/badge/Render-46E3B7?style=flat&logo=render&logoColor=white)
 
 ---
 
-Built by [Denzel Chingodza](https://denz-platform.vercel.app)
+## What it does
+
+The AI Intelligence Layer connects Sentinel and StackScope through a single query interface. Instead of navigating dashboards or calling APIs manually, you ask a question and get an answer.
+
+How it works:
+
+1. A question comes in through the API
+2. GPT-4o-mini classifies the intent and decides which service to call
+3. The relevant connector calls the internal API and returns its data
+4. The model summarises the result into a readable plain text answer
+
+```
+"Are any of my services down?"
+        |
+        v
+  GPT-4o-mini (intent classification)
+        |
+        v
+  Sentinel connector  -->  uptime data
+        |
+        v
+  "All services are up. Last incident was 4 days ago."
+```
+
+The connector architecture means adding a new service is one new file. Rate limiting is in place to control API costs.
+
+---
+
+## Stack
+
+| Layer | Technology |
+|---|---|
+| Backend | FastAPI, Python |
+| AI | OpenAI GPT-4o-mini |
+| Deployment | Render (API), Vercel (frontend) |
+
+---
+
+## Running locally
+
+**1. Clone and install**
+
+```bash
+git clone https://github.com/denz-os/ai-intelligence-layer.git
+cd ai-intelligence-layer
+pip install -r requirements.txt
+```
+
+**2. Create a `.env` file**
+
+```env
+OPENAI_API_KEY=your_openai_key
+SENTINEL_URL=your_sentinel_api_url
+STACKSCOPE_URL=your_stackscope_api_url
+```
+
+**3. Run**
+
+```bash
+uvicorn main:app --reload
+```
+
+---
+
+## What I learned
+
+I had already built several tools that worked independently. This project was about making them talk to each other through a layer that any person could use without knowing what was underneath.
+
+That is a different kind of engineering problem. Designing the connector architecture, thinking about how intent classification should work, and handling cases where the model is uncertain about which service to call pushed me to think about software composition in a way none of my earlier projects had. It is the project that most directly reflects where my interest in AI engineering is going.
+
+---
+
+## Part of
+
+This service is one component of a larger personal infrastructure. 
