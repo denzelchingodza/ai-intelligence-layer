@@ -40,6 +40,24 @@ def _parse(resp) -> dict:
         raise ValueError(f"Non-JSON response (HTTP {resp.status_code}): {snippet}")
 
 
+def _format_skills_list(label: str, result) -> str:
+    """Turn a list of skill dicts or strings into a readable sentence."""
+    if not result:
+        return f"No {label.lower()} data yet — StackScope may need a scrape run to populate its database."
+    # result is usually a list of dicts like {"skill": "python", "count": 42}
+    if isinstance(result, list):
+        names = []
+        for item in result[:10]:
+            if isinstance(item, dict):
+                skill = item.get("skill") or item.get("name") or str(item)
+                count = item.get("count") or item.get("frequency") or item.get("jobs")
+                names.append(f"{skill} ({count} jobs)" if count else skill)
+            else:
+                names.append(str(item))
+        return f"{label}: {', '.join(names)}."
+    return f"{label}: {result}"
+
+
 def extract_params(question: str) -> dict:
     """
     Uses GPT to pull structured data out of a natural language question.
@@ -101,7 +119,18 @@ def query_stackscope(question: str) -> dict:
                 timeout=15,
             )
             result = _parse(resp)
-            answer = f"Predicted salary for {', '.join(skills)} at {level} level: {result.get('predicted_salary_range', result)}"
+            low  = result.get("predicted_min") or result.get("min")
+            high = result.get("predicted_max") or result.get("max")
+            conf = result.get("confidence", "")
+            based = result.get("based_on", "")
+            if low and high:
+                answer = (
+                    f"Predicted salary for {', '.join(skills)} at {level} level: "
+                    f"${low:,.0f} – ${high:,.0f}"
+                    + (f" (confidence: {conf}, based on {based} jobs)" if conf else "")
+                )
+            else:
+                answer = f"Salary data for {', '.join(skills)}: {result}"
 
         # Gap analysis
         elif any(word in q for word in ["gap", "missing", "learn next", "improve", "lacking"]):
@@ -123,19 +152,19 @@ def query_stackscope(question: str) -> dict:
         elif any(word in q for word in ["emerging", "growing", "rising", "up and coming"]):
             resp   = requests.get(f"{STACKSCOPE_API_URL}/api/trends/emerging", timeout=15)
             result = _parse(resp)
-            answer = f"Emerging skills: {result}"
+            answer = _format_skills_list("Emerging skills", result)
 
         # Declining
         elif any(word in q for word in ["declining", "falling", "dying", "losing demand"]):
             resp   = requests.get(f"{STACKSCOPE_API_URL}/api/trends/declining", timeout=15)
             result = _parse(resp)
-            answer = f"Declining skills: {result}"
+            answer = _format_skills_list("Declining skills", result)
 
         # General trends (default)
         else:
             resp   = requests.get(f"{STACKSCOPE_API_URL}/api/trends", timeout=15)
             result = _parse(resp)
-            answer = f"Current skill trends: {result}"
+            answer = _format_skills_list("Top skills in demand", result)
 
     except Exception as e:
         return {"source": "stackscope", "answer": f"Could not reach StackScope: {e}", "metadata": {}}
