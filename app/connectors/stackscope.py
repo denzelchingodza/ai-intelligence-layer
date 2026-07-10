@@ -1,9 +1,26 @@
 import json
+import time
 import requests
 from openai import OpenAI
 from app.config import STACKSCOPE_API_URL, OPENAI_API_KEY
 
 client = OpenAI(api_key=OPENAI_API_KEY)
+
+
+def _wake(url: str, retries: int = 6, interval: int = 10) -> bool:
+    """
+    Ping the health endpoint until it returns 200 or we run out of retries.
+    Gives Render's free tier up to ~60s to wake up before the real query.
+    """
+    for _ in range(retries):
+        try:
+            r = requests.get(url, timeout=8)
+            if r.status_code == 200:
+                return True
+        except Exception:
+            pass
+        time.sleep(interval)
+    return False
 
 
 def _parse(resp) -> dict:
@@ -54,6 +71,15 @@ def query_stackscope(question: str) -> dict:
     """
     if not STACKSCOPE_API_URL:
         return {"source": "stackscope", "answer": "StackScope is not configured.", "metadata": {}}
+
+    # Wake StackScope up if it's sleeping on Render's free tier
+    awake = _wake(f"{STACKSCOPE_API_URL}/api/health")
+    if not awake:
+        return {
+            "source": "stackscope",
+            "answer": "StackScope is taking too long to start. It may be overloaded. Try again in a minute.",
+            "metadata": {},
+        }
 
     q = question.lower()
 

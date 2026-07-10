@@ -1,5 +1,19 @@
+import time
 import requests
 from app.config import DOCUZEN_API_URL
+
+
+def _wake(url: str, retries: int = 6, interval: int = 10) -> bool:
+    """Ping health until 200 or timeout — lets Render free tier wake up."""
+    for _ in range(retries):
+        try:
+            r = requests.get(url, timeout=8)
+            if r.status_code == 200:
+                return True
+        except Exception:
+            pass
+        time.sleep(interval)
+    return False
 
 
 def _parse(resp, label: str):
@@ -23,6 +37,15 @@ def query_docuzen(question: str) -> dict:
     """
     if not DOCUZEN_API_URL:
         return {"source": "docuzen", "answer": "DocuZen is not configured.", "metadata": {}}
+
+    # Wake DocuZen up if sleeping on Render's free tier
+    awake = _wake(f"{DOCUZEN_API_URL}/health")
+    if not awake:
+        return {
+            "source": "docuzen",
+            "answer": "DocuZen is taking too long to start. Try again in a minute.",
+            "metadata": {},
+        }
 
     try:
         resp = requests.get(f"{DOCUZEN_API_URL}/documents/", timeout=15)
