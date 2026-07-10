@@ -152,19 +152,28 @@ def query_stackscope(question: str) -> dict:
         elif any(word in q for word in ["emerging", "growing", "rising", "up and coming"]):
             resp   = requests.get(f"{STACKSCOPE_API_URL}/api/trends/emerging", timeout=15)
             result = _parse(resp)
-            answer = _format_skills_list("Emerging skills", result)
+            # Fall back to frequency if trends need more historical data
+            if not result:
+                resp   = requests.get(f"{STACKSCOPE_API_URL}/api/skills/frequency?limit=10", timeout=15)
+                result = _parse(resp)
+                answer = _format_skills_list("Most in-demand skills right now (trend data needs more time to build up)", result)
+            else:
+                answer = _format_skills_list("Emerging skills", result)
 
         # Declining
         elif any(word in q for word in ["declining", "falling", "dying", "losing demand"]):
             resp   = requests.get(f"{STACKSCOPE_API_URL}/api/trends/declining", timeout=15)
             result = _parse(resp)
-            answer = _format_skills_list("Declining skills", result)
+            if not result:
+                answer = "Not enough historical data yet to identify declining skills. Check back in a week or two as more scrapes run."
+            else:
+                answer = _format_skills_list("Declining skills", result)
 
-        # General trends (default)
+        # General trends / skills in demand (default)
         else:
-            resp   = requests.get(f"{STACKSCOPE_API_URL}/api/trends", timeout=15)
+            resp   = requests.get(f"{STACKSCOPE_API_URL}/api/skills/frequency?limit=10", timeout=15)
             result = _parse(resp)
-            answer = _format_skills_list("Top skills in demand", result)
+            answer = _format_skills_list("Top skills in demand right now", result)
 
     except Exception as e:
         return {"source": "stackscope", "answer": f"Could not reach StackScope: {e}", "metadata": {}}
