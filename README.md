@@ -11,26 +11,26 @@ A natural language interface across my personal projects. Ask a plain English qu
 
 ## What it does
 
-The AI Intelligence Layer connects Sentinel and StackScope through a single query interface. Instead of navigating dashboards or calling APIs manually, you ask a question and get an answer.
+The AI Intelligence Layer connects StackScope and DocuZen through a single query interface. Instead of navigating dashboards or calling APIs manually, you ask a question and get an answer.
 
 How it works:
 
 1. A question comes in through the API
 2. GPT-4o-mini classifies the intent and decides which service to call
 3. The relevant connector calls the internal API and returns its data
-4. The model summarises the result into a readable plain text answer
+4. The result is returned as a readable plain text answer
 
 ```
-"Are any of my services down?"
+"What skills are in demand right now?"
         |
         v
   GPT-4o-mini (intent classification)
         |
         v
-  Sentinel connector  -->  uptime data
+  StackScope connector  -->  live job market data
         |
         v
-  "All services are up. Last incident was 4 days ago."
+  "Python, SQL and React are the most in-demand skills this week."
 ```
 
 The connector architecture means adding a new service is one new file. Rate limiting is in place to control API costs.
@@ -61,14 +61,14 @@ pip install -r requirements.txt
 
 ```env
 OPENAI_API_KEY=your_openai_key
-SENTINEL_URL=your_sentinel_api_url
-STACKSCOPE_URL=your_stackscope_api_url
+STACKSCOPE_API_URL=your_stackscope_api_url
+DOCUZEN_API_URL=your_docuzen_api_url
 ```
 
 **3. Run**
 
 ```bash
-uvicorn main:app --reload
+uvicorn app.main:app --reload
 ```
 
 ---
@@ -83,4 +83,4 @@ That is a different kind of engineering problem. Designing the connector archite
 
 ## Part of
 
-This service is one component of a larger personal infrastructure. 
+This service is one component of a larger personal infrastructure.
