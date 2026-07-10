@@ -6,332 +6,597 @@
   <title>AI Intelligence Layer</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0e0e0e;
+      --surface:   #161616;
+      --surface2:  #1e1e1e;
+      --border:    #2a2a2a;
+      --border2:   #333;
+      --text:      #e8e8e8;
+      --text2:     #888;
+      --text3:     #555;
+      --accent:    #4f8ef7;
+      --accent-bg: rgba(79,142,247,.10);
+      --pro:       #9b7fe8;
+      --pro-bg:    rgba(155,127,232,.10);
+      --radius:    8px;
+    }
 
     body {
       font-family: system-ui, -apple-system, sans-serif;
-      background: #0f0f0f;
-      color: #e0e0e0;
-      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
       display: flex;
-      flex-direction: column;
+      overflow: hidden;
     }
 
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      background: var(--surface);
+      border-right: 0.5px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 16px 10px;
+      gap: 4px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px 16px;
+      border-bottom: 0.5px solid var(--border);
+      margin-bottom: 8px;
+    }
+    .logo-icon {
+      width: 26px; height: 26px;
+      border-radius: 6px;
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-icon i { color: #fff; font-size: 14px; }
+    .logo-text { font-size: 13px; font-weight: 500; color: var(--text); }
+    .logo-sub  { font-size: 11px; color: var(--text3); }
+
+    .sid-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--text3);
+      padding: 12px 10px 4px;
+    }
+
+    .sid-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      color: var(--text2);
+      cursor: pointer;
+      transition: background .12s, color .12s;
+      user-select: none;
+    }
+    .sid-item:hover { background: var(--surface2); color: var(--text); }
+    .sid-item.active { background: var(--accent-bg); color: var(--accent); }
+    .sid-item i { font-size: 15px; flex-shrink: 0; }
+    .sid-item .hist-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px; }
+
+    .sid-new {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      color: var(--text2);
+      cursor: pointer;
+      border: 0.5px solid var(--border);
+      background: var(--surface2);
+      transition: border-color .12s, color .12s;
+    }
+    .sid-new:hover { border-color: var(--border2); color: var(--text); }
+    .sid-new i { font-size: 14px; }
+
+    /* ── Main ── */
     .main {
       flex: 1;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 4rem 1.5rem 3rem;
-      text-align: center;
-    }
-
-    .logo {
-      font-size: 11px;
-      font-weight: 500;
-      color: #3a3a3a;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      margin-bottom: 2rem;
-    }
-
-    .hero h1 {
-      font-size: 32px;
-      font-weight: 500;
-      color: #efefef;
-      line-height: 1.3;
-      margin-bottom: 8px;
-    }
-
-    .hero p {
-      font-size: 14px;
-      color: #444;
-      line-height: 1.7;
-      margin-bottom: 2.5rem;
-    }
-
-    .box {
-      width: 100%;
-      max-width: 560px;
-      background: #161616;
-      border-radius: 16px;
-      border: 0.5px solid #262626;
       overflow: hidden;
-      text-align: left;
     }
 
-    .box textarea {
-      width: 100%;
-      min-height: 100px;
-      padding: 1.25rem 1.25rem 0.5rem;
-      font-size: 15px;
-      font-family: inherit;
-      color: #e0e0e0;
-      background: transparent;
-      border: none;
-      outline: none;
-      resize: none;
-      line-height: 1.7;
-    }
-
-    .box textarea::placeholder { color: #333; }
-
-    .box-footer {
+    /* ── Top bar ── */
+    .topbar {
+      height: 48px;
+      border-bottom: 0.5px solid var(--border);
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 12px 1.25rem 1rem;
-    }
-
-    .pills { display: flex; gap: 6px; flex-wrap: wrap; }
-
-    .pill {
-      font-size: 11px;
-      padding: 4px 10px;
-      border-radius: 99px;
-      border: 0.5px solid #252525;
-      color: #3a3a3a;
-      cursor: pointer;
-      background: transparent;
-      transition: all 0.15s;
-    }
-
-    .pill:hover { color: #aaa; border-color: #3a3a3a; }
-
-    .send-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: none;
-      background: #e8e8e8;
-      color: #0f0f0f;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: background 0.15s;
-    }
-
-    .send-btn:hover { background: #fff; }
-    .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .send-btn i { font-size: 16px; }
-
-    .answer-wrap {
-      width: 100%;
-      max-width: 560px;
-      margin-top: 1.5rem;
-      display: none;
-      text-align: left;
-    }
-
-    .tool-row {
-      display: flex;
-      align-items: center;
+      padding: 0 20px;
       gap: 10px;
-      margin-bottom: 1rem;
+      flex-shrink: 0;
     }
-
-    .tool-line { flex: 1; height: 0.5px; background: #222; }
-
-    .tool-label {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-      padding: 3px 12px;
-      border-radius: 99px;
-    }
-
-    .tl-sentinel  { background: #2a1414; color: #e05555; }
-    .tl-stackscope { background: #112236; color: #4d9de0; }
-    .tl-docuzen   { background: #122218; color: #4caf78; }
-    .tl-error     { background: #1e1a10; color: #c8903a; }
-
-    .answer-text {
-      font-size: 15px;
-      color: #bbb;
-      line-height: 1.8;
-      margin-bottom: 1rem;
-    }
-
-    .source-chips { display: flex; gap: 6px; flex-wrap: wrap; }
-
-    .source-chip {
-      font-size: 11px;
-      color: #3a3a3a;
-      border: 0.5px solid #222;
-      border-radius: 6px;
-      padding: 3px 10px;
-    }
-
-    footer {
-      border-top: 0.5px solid #1a1a1a;
-      padding: 1.5rem;
-      text-align: center;
-    }
-
-    .footer-links {
+    .topbar-title { font-size: 13px; color: var(--text2); }
+    .source-indicator {
+      margin-left: auto;
       display: flex;
-      justify-content: center;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-      margin-bottom: 1rem;
+      align-items: center;
+      gap: 6px;
+    }
+    .src-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #3dba6e;
+    }
+    .src-label { font-size: 12px; color: var(--text3); }
+
+    /* ── Chat ── */
+    .chat {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      scroll-behavior: smooth;
+    }
+    .chat::-webkit-scrollbar { width: 4px; }
+    .chat::-webkit-scrollbar-track { background: transparent; }
+    .chat::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+    /* Empty state */
+    .empty-state {
+      margin: auto;
+      text-align: center;
+      max-width: 400px;
+    }
+    .empty-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      background: var(--accent-bg);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .empty-icon i { font-size: 22px; color: var(--accent); }
+    .empty-title { font-size: 18px; font-weight: 500; margin-bottom: 6px; }
+    .empty-sub { font-size: 13px; color: var(--text2); line-height: 1.6; }
+    .quick-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 24px;
+    }
+    .quick-card {
+      text-align: left;
+      padding: 12px 14px;
+      border-radius: var(--radius);
+      border: 0.5px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      transition: border-color .12s, background .12s;
+    }
+    .quick-card:hover { border-color: var(--border2); background: var(--surface2); }
+    .quick-card-title { font-size: 12px; font-weight: 500; margin-bottom: 2px; }
+    .quick-card-sub   { font-size: 11px; color: var(--text2); }
+
+    /* Messages */
+    .msg { display: flex; gap: 10px; align-items: flex-start; max-width: 680px; }
+    .msg.user { flex-direction: row-reverse; margin-left: auto; }
+
+    .avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 500; flex-shrink: 0;
+    }
+    .avatar.ai   { background: var(--pro-bg); color: var(--pro); border: 0.5px solid rgba(155,127,232,.2); }
+    .avatar.user { background: var(--accent-bg); color: var(--accent); border: 0.5px solid rgba(79,142,247,.2); }
+
+    .bubble {
+      padding: 11px 15px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      line-height: 1.65;
+    }
+    .bubble.user {
+      background: var(--accent);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .bubble.ai {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      color: var(--text);
+      border-bottom-left-radius: 4px;
     }
 
-    .footer-links a {
-      font-size: 12px;
-      color: #333;
-      text-decoration: none;
+    .ai-wrap { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+
+    .source-tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 10px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: .06em;
+      padding: 3px 9px; border-radius: 20px;
+      background: var(--pro-bg); color: var(--pro);
+      align-self: flex-start;
+    }
+    .source-tag.stackscope { background: var(--accent-bg); color: var(--accent); }
+    .source-tag.docuzen    { background: rgba(61,186,110,.1); color: #3dba6e; }
+    .source-tag i { font-size: 11px; }
+
+    .skill-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .skill-chip {
+      padding: 4px 10px; border-radius: 20px;
+      font-size: 12px; background: var(--surface2);
+      border: 0.5px solid var(--border2); color: var(--text2);
+    }
+    .skill-chip strong { color: var(--text); font-weight: 500; }
+
+    .meta-row {
+      display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;
+    }
+    .meta-card {
+      padding: 8px 12px; border-radius: var(--radius);
+      background: var(--surface2); border: 0.5px solid var(--border);
+      text-align: center; min-width: 80px;
+    }
+    .meta-val { font-size: 16px; font-weight: 500; }
+    .meta-lbl { font-size: 10px; color: var(--text3); margin-top: 1px; }
+
+    /* Typing indicator */
+    .typing { display: flex; gap: 4px; align-items: center; padding: 11px 15px; }
+    .typing span {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--text3);
+      animation: bounce .9s infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: .15s; }
+    .typing span:nth-child(3) { animation-delay: .30s; }
+    @keyframes bounce {
+      0%,60%,100% { transform: translateY(0); }
+      30% { transform: translateY(-5px); }
     }
 
-    .footer-links a:hover { color: #666; }
-
-    .footer-tc {
-      font-size: 11px;
-      color: #272727;
-      line-height: 1.7;
-      max-width: 520px;
-      margin: 0 auto 1rem;
+    /* ── Input area ── */
+    .input-area {
+      border-top: 0.5px solid var(--border);
+      padding: 14px 20px;
+      background: var(--surface);
+      flex-shrink: 0;
     }
+    .input-box {
+      display: flex; align-items: flex-end; gap: 10px;
+      background: var(--surface2);
+      border: 0.5px solid var(--border2);
+      border-radius: 10px;
+      padding: 10px 12px;
+      transition: border-color .15s;
+    }
+    .input-box:focus-within { border-color: var(--accent); }
+    .input-box textarea {
+      flex: 1; background: none; border: none; outline: none;
+      color: var(--text); font-family: inherit; font-size: 13.5px;
+      line-height: 1.5; resize: none; min-height: 22px; max-height: 120px;
+    }
+    .input-box textarea::placeholder { color: var(--text3); }
+    .send-btn {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--accent); border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0;
+      transition: opacity .12s;
+    }
+    .send-btn:disabled { opacity: .4; cursor: default; }
+    .send-btn i { color: #fff; font-size: 15px; }
+    .input-hint { font-size: 11px; color: var(--text3); margin-top: 8px; text-align: center; }
 
-    .footer-copy { font-size: 11px; color: #2a2a2a; }
+    /* Scrollbar for chat */
+    .chat { scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
   </style>
 </head>
 <body>
 
-  <main class="main">
-    
-    <div class="hero">
-      <h1>Ask anything.<br>It knows where to look.</h1>
-      <p>Connects StackScope and DocuZen. One question, one answer.</p>
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-icon"><i class="ti ti-cpu" aria-hidden="true"></i></div>
+    <div>
+      <div class="logo-text">AI Layer</div>
+      <div class="logo-sub">Intelligence interface</div>
     </div>
+  </div>
 
-    <div class="box">
-      <textarea id="q" placeholder="Ask about your services, the job market, or an uploaded document..."></textarea>
-      <div class="box-footer">
-        <div class="pills">
-          <div class="pill" onclick="fill('Are all my services up?')">services</div>
-          <div class="pill" onclick="fill('What skills are trending for backend devs?')">trending skills</div>
-          <div class="pill" onclick="fill('Salary for a senior with Python and AWS?')">salary</div>
-          <div class="pill" onclick="fill('Summarise the uploaded document')">document</div>
+  <div class="sid-label">Sources</div>
+  <div class="sid-item active" onclick="setSource('all', this)">
+    <i class="ti ti-layers-subtract" aria-hidden="true"></i> All sources
+  </div>
+  <div class="sid-item" onclick="setSource('stackscope', this)">
+    <i class="ti ti-chart-bar" aria-hidden="true"></i> StackScope
+  </div>
+  <div class="sid-item" onclick="setSource('docuzen', this)">
+    <i class="ti ti-file-text" aria-hidden="true"></i> DocuZen
+  </div>
+
+  <div class="sid-label">History</div>
+  <div id="history-list" style="display:flex;flex-direction:column;gap:2px;"></div>
+
+  <div class="sid-new" onclick="newChat()">
+    <i class="ti ti-plus" aria-hidden="true"></i> New chat
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <i class="ti ti-message-circle" style="font-size:15px;color:var(--text3)" aria-hidden="true"></i>
+    <span class="topbar-title" id="topbar-title">New conversation</span>
+    <div class="source-indicator">
+      <div class="src-dot" id="status-dot" style="background:var(--text3)"></div>
+      <span class="src-label" id="status-label">Ready</span>
+    </div>
+  </div>
+
+  <div class="chat" id="chat">
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon"><i class="ti ti-cpu" aria-hidden="true"></i></div>
+      <div class="empty-title">Ask anything.</div>
+      <div class="empty-sub">Routes your question to StackScope or DocuZen and returns a plain answer.</div>
+      <div class="quick-grid">
+        <div class="quick-card" onclick="fillAndSend('What skills are trending for backend devs?')">
+          <div class="quick-card-title">Trending skills</div>
+          <div class="quick-card-sub">Live from job listings</div>
         </div>
-        <button class="send-btn" id="send-btn" onclick="ask()" aria-label="Send">
-          <i class="ti ti-arrow-up"></i>
-        </button>
+        <div class="quick-card" onclick="fillAndSend('Salary for a senior Python and AWS developer?')">
+          <div class="quick-card-title">Salary prediction</div>
+          <div class="quick-card-sub">By skill + experience</div>
+        </div>
+        <div class="quick-card" onclick="fillAndSend('What skills am I missing if I know Python and React?')">
+          <div class="quick-card-title">Skill gap analysis</div>
+          <div class="quick-card-sub">What to learn next</div>
+        </div>
+        <div class="quick-card" onclick="fillAndSend('Summarise the uploaded document')">
+          <div class="quick-card-title">Document Q&amp;A</div>
+          <div class="quick-card-sub">Via DocuZen</div>
+        </div>
       </div>
     </div>
+  </div>
 
-    <div class="answer-wrap" id="answer-wrap">
-      <div class="tool-row">
-        <div class="tool-line"></div>
-        <div class="tool-label" id="tool-label"></div>
-        <div class="tool-line"></div>
-      </div>
-      <div class="answer-text" id="answer-text"></div>
-      <div class="source-chips" id="source-chips"></div>
+  <div class="input-area">
+    <div class="input-box">
+      <textarea
+        id="q"
+        rows="1"
+        placeholder="Ask about skills, salaries, or your documents…"
+        onkeydown="handleKey(event)"
+        oninput="autoResize(this)"
+      ></textarea>
+      <button class="send-btn" id="send-btn" onclick="ask()" aria-label="Send">
+        <i class="ti ti-arrow-up" aria-hidden="true"></i>
+      </button>
     </div>
-  </main>
+    <div class="input-hint">StackScope · DocuZen &nbsp;·&nbsp; Enter to send, Shift+Enter for new line</div>
+  </div>
+</div>
 
-  <footer>
-    <div class="footer-links">
-      <a href="https://denz-platform.vercel.app" target="_blank" rel="noopener">Portfolio</a>
-<a href="https://stack-scope-eight.vercel.app" target="_blank" rel="noopener">StackScope</a>
-      <a href="https://docuzen.vercel.app" target="_blank" rel="noopener">DocuZen</a>
-      <a href="https://github.com/denzelchingodza" target="_blank" rel="noopener">GitHub</a>
-    </div>
-    <p class="footer-tc">For personal and educational use only. AI generated answers may not always be accurate verify before acting on them. Salary and skills data is sourced from public job listings.</p>
-    <p class="footer-copy">Built by Denzel Chingodza · © 2026</p>
-  </footer>
+<script>
+  const API_BASE = 'https://ai-intelligence-layer.onrender.com';
+  let history = [];
+  let currentSource = 'all';
 
-  <script>
-    // Replace with your deployed Render backend URL before pushing
-    const API_BASE = 'https://ai-intelligence-layer.onrender.com';
+  function setSource(src, el) {
+    currentSource = src;
+    document.querySelectorAll('.sid-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+  }
 
-    function fill(text) {
-      document.getElementById('q').value = text;
-      document.getElementById('q').focus();
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(); }
+  }
+
+  function fillAndSend(text) {
+    document.getElementById('q').value = text;
+    ask();
+  }
+
+  function newChat() {
+    history = [];
+    const chat = document.getElementById('chat');
+    chat.innerHTML = '';
+    document.getElementById('topbar-title').textContent = 'New conversation';
+    restoreEmpty();
+  }
+
+  function restoreEmpty() {
+    const chat = document.getElementById('chat');
+    if (!chat.querySelector('.empty-state')) {
+      chat.innerHTML = `
+        <div class="empty-state" id="empty-state">
+          <div class="empty-icon"><i class="ti ti-cpu" aria-hidden="true"></i></div>
+          <div class="empty-title">Ask anything.</div>
+          <div class="empty-sub">Routes your question to StackScope or DocuZen and returns a plain answer.</div>
+          <div class="quick-grid">
+            <div class="quick-card" onclick="fillAndSend('What skills are trending for backend devs?')">
+              <div class="quick-card-title">Trending skills</div>
+              <div class="quick-card-sub">Live from job listings</div>
+            </div>
+            <div class="quick-card" onclick="fillAndSend('Salary for a senior Python and AWS developer?')">
+              <div class="quick-card-title">Salary prediction</div>
+              <div class="quick-card-sub">By skill + experience</div>
+            </div>
+            <div class="quick-card" onclick="fillAndSend('What skills am I missing if I know Python and React?')">
+              <div class="quick-card-title">Skill gap analysis</div>
+              <div class="quick-card-sub">What to learn next</div>
+            </div>
+            <div class="quick-card" onclick="fillAndSend('Summarise the uploaded document')">
+              <div class="quick-card-title">Document Q&amp;A</div>
+              <div class="quick-card-sub">Via DocuZen</div>
+            </div>
+          </div>
+        </div>`;
+    }
+  }
+
+  function addToHistory(text) {
+    const list = document.getElementById('history-list');
+    const short = text.length > 28 ? text.slice(0, 28) + '…' : text;
+    const el = document.createElement('div');
+    el.className = 'sid-item';
+    el.innerHTML = `<i class="ti ti-message" aria-hidden="true"></i><span class="hist-text">${short}</span>`;
+    list.prepend(el);
+    if (list.children.length > 6) list.lastElementChild.remove();
+  }
+
+  function setStatus(label, color) {
+    document.getElementById('status-dot').style.background = color;
+    document.getElementById('status-label').textContent = label;
+  }
+
+  function appendUser(text) {
+    const empty = document.getElementById('empty-state');
+    if (empty) empty.remove();
+    const chat = document.getElementById('chat');
+    const el = document.createElement('div');
+    el.className = 'msg user';
+    el.innerHTML = `
+      <div class="avatar user">DC</div>
+      <div class="bubble user">${escHtml(text)}</div>`;
+    chat.appendChild(el);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  function appendTyping() {
+    const chat = document.getElementById('chat');
+    const el = document.createElement('div');
+    el.className = 'msg';
+    el.id = 'typing-msg';
+    el.innerHTML = `
+      <div class="avatar ai"><i class="ti ti-cpu" style="font-size:12px" aria-hidden="true"></i></div>
+      <div class="bubble ai typing"><span></span><span></span><span></span></div>`;
+    chat.appendChild(el);
+    chat.scrollTop = chat.scrollHeight;
+    return el;
+  }
+
+  function removeTyping() {
+    const el = document.getElementById('typing-msg');
+    if (el) el.remove();
+  }
+
+  function appendAI(data) {
+    const chat = document.getElementById('chat');
+    const src = data.source || 'unknown';
+    const srcClass = src === 'stackscope' ? 'stackscope' : src === 'docuzen' ? 'docuzen' : '';
+    const srcIcon = src === 'stackscope' ? 'ti-chart-bar' : src === 'docuzen' ? 'ti-file-text' : 'ti-cpu';
+    const srcLabel = src === 'stackscope' ? 'StackScope' : src === 'docuzen' ? 'DocuZen' : src;
+
+    const answer = data.answer || 'No answer returned.';
+    const meta = data.metadata || {};
+
+    let extras = '';
+
+    // Skill chips from answer text parsing (chips appear in answer string)
+    const chipMatch = answer.match(/skills?:\s*(.+)/i);
+    if (chipMatch && src === 'stackscope') {
+      const parts = chipMatch[1].split(',').map(s => s.trim()).filter(Boolean).slice(0, 8);
+      if (parts.length > 1) {
+        extras += `<div class="skill-chips">${parts.map(p => `<div class="skill-chip">${escHtml(p)}</div>`).join('')}</div>`;
+      }
     }
 
-    function showStatus(label, labelClass, text) {
-      document.getElementById('tool-label').className = 'tool-label ' + labelClass;
-      document.getElementById('tool-label').textContent = label;
-      document.getElementById('answer-text').textContent = text;
-      document.getElementById('source-chips').innerHTML = '';
-      document.getElementById('answer-wrap').style.display = 'block';
+    // Meta cards for salary
+    if (meta.document) {
+      extras += `<div class="meta-row"><div class="meta-card"><div class="meta-val" style="font-size:13px">${escHtml(meta.document)}</div><div class="meta-lbl">Document</div></div></div>`;
     }
 
-    async function postQuery(q) {
-      const res = await fetch(`${API_BASE}/query`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: q }),
-      });
-      if (!res.ok) throw new Error(`Server error ${res.status}`);
-      return res.json();
+    const el = document.createElement('div');
+    el.className = 'msg';
+    el.innerHTML = `
+      <div class="avatar ai"><i class="ti ti-cpu" style="font-size:12px" aria-hidden="true"></i></div>
+      <div class="ai-wrap">
+        <div class="source-tag ${srcClass}"><i class="ti ${srcIcon}" aria-hidden="true"></i> ${srcLabel}</div>
+        <div class="bubble ai">${escHtml(answer)}${extras}</div>
+      </div>`;
+    chat.appendChild(el);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  async function postQuery(q) {
+    const res = await fetch(`${API_BASE}/query`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: q }),
+    });
+    if (!res.ok) throw new Error(`Server error ${res.status}`);
+    return res.json();
+  }
+
+  async function ask() {
+    const textarea = document.getElementById('q');
+    const q = textarea.value.trim();
+    if (!q) return;
+
+    textarea.value = '';
+    textarea.style.height = 'auto';
+
+    const btn = document.getElementById('send-btn');
+    btn.disabled = true;
+
+    if (history.length === 0) {
+      document.getElementById('topbar-title').textContent = q.length > 40 ? q.slice(0, 40) + '…' : q;
+      addToHistory(q);
     }
 
-    async function ask() {
-      const q = document.getElementById('q').value.trim();
-      if (!q) return;
+    appendUser(q);
+    const typingEl = appendTyping();
+    setStatus('Thinking…', '#f5a623');
 
-      const btn = document.getElementById('send-btn');
-      btn.disabled = true;
-      btn.innerHTML = '<i class="ti ti-loader-2" style="animation: spin 1s linear infinite;"></i>';
+    const MAX = 4;
+    const DELAY = 12000;
+    let data = null;
 
-      const MAX_RETRIES = 4;
-      const RETRY_DELAY = 12000; // 12s — gives Render time to wake up
-
-      let data = null;
-      for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-        try {
-          data = await postQuery(q);
-          break;
-        } catch (err) {
-          if (attempt < MAX_RETRIES - 1) {
-            const secsLeft = Math.round((RETRY_DELAY * (MAX_RETRIES - attempt - 1)) / 1000);
-            showStatus(
-              'Waking up',
-              'tl-error',
-              `Server is starting up (free tier). Retrying… attempt ${attempt + 2} of ${MAX_RETRIES}.`
-            );
-            await new Promise(r => setTimeout(r, RETRY_DELAY));
-          } else {
-            showStatus('Error', 'tl-error', `Could not reach the backend after ${MAX_RETRIES} attempts. Try again in a minute.`);
-          }
+    for (let i = 0; i < MAX; i++) {
+      try {
+        data = await postQuery(q);
+        break;
+      } catch (err) {
+        removeTyping();
+        if (i < MAX - 1) {
+          setStatus(`Waking up… retry ${i + 2}/${MAX}`, '#f5a623');
+          appendTyping();
+          await new Promise(r => setTimeout(r, DELAY));
+        } else {
+          appendAI({ source: 'error', answer: `Could not reach the backend after ${MAX} attempts. Try again in a minute.`, metadata: {} });
+          setStatus('Offline', '#e05555');
         }
       }
-
-      if (data) {
-        const labels = { stackscope: 'StackScope', docuzen: 'DocuZen' };
-        const cls    = { stackscope: 'tl-stackscope', docuzen: 'tl-docuzen' };
-        const src    = data.source || 'unknown';
-
-        document.getElementById('tool-label').className = 'tool-label ' + (cls[src] || 'tl-error');
-        document.getElementById('tool-label').textContent = labels[src] || src;
-        document.getElementById('answer-text').textContent = data.answer || 'No answer returned.';
-
-        const meta = data.metadata || {};
-        const chips = [];
-        if (meta.document) chips.push(meta.document);
-        document.getElementById('source-chips').innerHTML = chips.map(c => `<span class="source-chip">${c}</span>`).join('');
-
-        document.getElementById('answer-wrap').style.display = 'block';
-      }
-
-      btn.disabled = false;
-      btn.innerHTML = '<i class="ti ti-arrow-up"></i>';
     }
 
-    document.getElementById('q').addEventListener('keydown', e => {
-      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(); }
-    });
+    removeTyping();
 
-    const style = document.createElement('style');
-    style.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
-    document.head.appendChild(style);
-  </script>
+    if (data) {
+      appendAI(data);
+      setStatus('Ready', '#3dba6e');
+    }
 
+    btn.disabled = false;
+    textarea.focus();
+  }
+</script>
 </body>
 </html>
