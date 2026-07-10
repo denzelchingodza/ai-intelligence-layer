@@ -205,7 +205,7 @@
     
     <div class="hero">
       <h1>Ask anything.<br>It knows where to look.</h1>
-      <p>Connects Sentinel, StackScope, and DocuZen one question, one answer.</p>
+      <p>Connects StackScope and DocuZen. One question, one answer.</p>
     </div>
 
     <div class="box">
@@ -237,8 +237,7 @@
   <footer>
     <div class="footer-links">
       <a href="https://denz-platform.vercel.app" target="_blank" rel="noopener">Portfolio</a>
-      <a href="https://sentinel-kappa-wine.vercel.app" target="_blank" rel="noopener">Sentinel</a>
-      <a href="https://stack-scope-eight.vercel.app" target="_blank" rel="noopener">StackScope</a>
+<a href="https://stack-scope-eight.vercel.app" target="_blank" rel="noopener">StackScope</a>
       <a href="https://docuzen.vercel.app" target="_blank" rel="noopener">DocuZen</a>
       <a href="https://github.com/denzelchingodza" target="_blank" rel="noopener">GitHub</a>
     </div>
@@ -255,6 +254,24 @@
       document.getElementById('q').focus();
     }
 
+    function showStatus(label, labelClass, text) {
+      document.getElementById('tool-label').className = 'tool-label ' + labelClass;
+      document.getElementById('tool-label').textContent = label;
+      document.getElementById('answer-text').textContent = text;
+      document.getElementById('source-chips').innerHTML = '';
+      document.getElementById('answer-wrap').style.display = 'block';
+    }
+
+    async function postQuery(q) {
+      const res = await fetch(`${API_BASE}/query`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: q }),
+      });
+      if (!res.ok) throw new Error(`Server error ${res.status}`);
+      return res.json();
+    }
+
     async function ask() {
       const q = document.getElementById('q').value.trim();
       if (!q) return;
@@ -263,18 +280,32 @@
       btn.disabled = true;
       btn.innerHTML = '<i class="ti ti-loader-2" style="animation: spin 1s linear infinite;"></i>';
 
-      try {
-        const res = await fetch(`${API_BASE}/query`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: q }),
-        });
+      const MAX_RETRIES = 4;
+      const RETRY_DELAY = 12000; // 12s — gives Render time to wake up
 
-        if (!res.ok) throw new Error(`Server error ${res.status}`);
-        const data = await res.json();
+      let data = null;
+      for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+        try {
+          data = await postQuery(q);
+          break;
+        } catch (err) {
+          if (attempt < MAX_RETRIES - 1) {
+            const secsLeft = Math.round((RETRY_DELAY * (MAX_RETRIES - attempt - 1)) / 1000);
+            showStatus(
+              'Waking up',
+              'tl-error',
+              `Server is starting up (free tier). Retrying… attempt ${attempt + 2} of ${MAX_RETRIES}.`
+            );
+            await new Promise(r => setTimeout(r, RETRY_DELAY));
+          } else {
+            showStatus('Error', 'tl-error', `Could not reach the backend after ${MAX_RETRIES} attempts. Try again in a minute.`);
+          }
+        }
+      }
 
-        const labels = { sentinel: 'Sentinel', stackscope: 'StackScope', docuzen: 'DocuZen' };
-        const cls    = { sentinel: 'tl-sentinel', stackscope: 'tl-stackscope', docuzen: 'tl-docuzen' };
+      if (data) {
+        const labels = { stackscope: 'StackScope', docuzen: 'DocuZen' };
+        const cls    = { stackscope: 'tl-stackscope', docuzen: 'tl-docuzen' };
         const src    = data.source || 'unknown';
 
         document.getElementById('tool-label').className = 'tool-label ' + (cls[src] || 'tl-error');
@@ -284,16 +315,8 @@
         const meta = data.metadata || {};
         const chips = [];
         if (meta.document) chips.push(meta.document);
-        if (meta.total !== undefined) chips.push(`${meta.total} monitors`);
         document.getElementById('source-chips').innerHTML = chips.map(c => `<span class="source-chip">${c}</span>`).join('');
 
-        document.getElementById('answer-wrap').style.display = 'block';
-
-      } catch (err) {
-        document.getElementById('tool-label').className = 'tool-label tl-error';
-        document.getElementById('tool-label').textContent = 'Error';
-        document.getElementById('answer-text').textContent = `Could not reach the backend. Make sure the API is running. (${err.message})`;
-        document.getElementById('source-chips').innerHTML = '';
         document.getElementById('answer-wrap').style.display = 'block';
       }
 
