@@ -11,7 +11,7 @@ A natural language interface across my personal projects. Ask a plain English qu
 
 ## What it does
 
-The AI Intelligence Layer connects StackScope and DocuZen through a single query interface. Instead of navigating dashboards or calling APIs manually, you ask a question and get an answer.
+The AI Intelligence Layer connects StackScope and DocuZen through a single query interface. Instead of navigating dashboards or calling APIs manually, you ask a question and get an answer!
 
 How it works:
 
