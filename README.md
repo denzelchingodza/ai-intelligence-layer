@@ -85,7 +85,7 @@ That is a different kind of engineering problem. Designing the connector archite
 
 **GPT returning inconsistent classification output**
 
-Early versions of the router prompt asked GPT to "identify which tool to use". The model would return things like `"I think this is a stackscope question"` or `"The answer is: docuzen"` instead of the bare word. The downstream `if tool == "stackscope"` check would always fall through to the else branch. Fixed by making the prompt extremely explicit — "Reply with only the single word: stackscope or docuzen. Nothing else." — combined with `.strip().lower()` on the response and an explicit else branch that returns a readable fallback:
+Early versions of the router prompt asked GPT to "identify which tool to use". The model would return things like `"I think this is a stackscope question"` or `"The answer is: docuzen"` instead of the bare word. The downstream `if tool == "stackscope"` check would always fall through to the else branch. Fixed by making the prompt extremely explicit "Reply with only the single word: stackscope or docuzen. Nothing else." combined with `.strip().lower()` on the response and an explicit else branch that returns a readable fallback:
 
 ```python
 else:
@@ -98,7 +98,7 @@ else:
 
 **API errors crashing the frontend**
 
-When a downstream connector threw an exception (StackScope API down, OpenAI timeout), the unhandled error bubbled up as a 500 response. The Next.js frontend had no error handling for 500s and broke silently. Fixed by catching all exceptions in the route handler and returning a structured 200 response with the error message in the body — the frontend always gets a renderable object:
+When a downstream connector threw an exception (StackScope API down, OpenAI timeout), the unhandled error bubbled up as a 500 response. The Next.js frontend had no error handling for 500s and broke silently. Fixed by catching all exceptions in the route handler and returning a structured 200 response with the error message in the body the frontend always gets a renderable object:
 
 ```python
 except Exception as e:
@@ -114,7 +114,7 @@ The frontend on Vercel and the API on Render are different origins. Without CORS
 
 **OpenAI costs during development**
 
-Every query hits GPT twice — once for classification and once inside the connector for the answer. Without a rate limit, rapid testing during development added up quickly. Added `slowapi` with a 10 requests/hour limit per IP to protect costs in production.
+Every query hits GPT twice once for classification and once inside the connector for the answer. Without a rate limit, rapid testing during development added up quickly. Added `slowapi` with a 10 requests/hour limit per IP to protect costs in production.
 
 ---
 
