@@ -629,15 +629,32 @@
     empty.className = 'chat-empty';
     empty.id = 'chat-empty';
 
-    const chips = suggestions.map(s =>
-      '<button class="suggestion-chip" onclick="fillAndSend(' + JSON.stringify(s) + ')">' + s + '</button>'
-    ).join('');
+    const iconEl = document.createElement('div');
+    iconEl.className = 'chat-empty-icon ' + cls;
+    iconEl.innerHTML = '<i class="ti ' + icon + '" aria-hidden="true"></i>';
 
-    empty.innerHTML =
-      '<div class="chat-empty-icon ' + cls + '"><i class="ti ' + icon + '" aria-hidden="true"></i></div>' +
-      '<p class="chat-empty-name">' + name + '</p>' +
-      '<p class="chat-empty-hint">Try one of these or ask your own</p>' +
-      '<div class="chat-suggestions">' + chips + '</div>';
+    const nameEl = document.createElement('p');
+    nameEl.className = 'chat-empty-name';
+    nameEl.textContent = name;
+
+    const hintEl = document.createElement('p');
+    hintEl.className = 'chat-empty-hint';
+    hintEl.textContent = 'Try one of these or ask your own';
+
+    const grid = document.createElement('div');
+    grid.className = 'chat-suggestions';
+    suggestions.forEach(function(s) {
+      const btn = document.createElement('button');
+      btn.className = 'suggestion-chip';
+      btn.textContent = s;
+      btn.addEventListener('click', function() { fillAndSend(s); });
+      grid.appendChild(btn);
+    });
+
+    empty.appendChild(iconEl);
+    empty.appendChild(nameEl);
+    empty.appendChild(hintEl);
+    empty.appendChild(grid);
     feed.appendChild(empty);
 
     document.getElementById('chat-status').textContent = 'Ready';
