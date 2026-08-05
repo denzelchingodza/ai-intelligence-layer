@@ -306,6 +306,32 @@
       font-size: 13px;
       color: var(--faint);
     }
+    .chat-suggestions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 8px;
+      width: 100%;
+      max-width: 560px;
+    }
+    .suggestion-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+      font-size: 13px;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.5;
+      transition: border-color .15s, background .15s, color .15s;
+    }
+    .suggestion-chip:hover {
+      border-color: var(--border-mid);
+      background: var(--surface-hover);
+      color: rgba(255,255,255,0.75);
+    }
 
     /* Messages */
     #feed {
@@ -584,16 +610,34 @@
     // Send button color
     document.getElementById('btn').className = 'send-btn ' + cls;
 
-    // Reset feed (keep empty state)
+    const suggestions = isS ? [
+      'What skills are trending for backend developers right now?',
+      'Salary range for a senior Python and AWS developer?',
+      'What should I learn to break into machine learning?',
+      'Best paying remote jobs for React developers?'
+    ] : [
+      'What is the first-line treatment for septic shock?',
+      'What are the CURB-65 criteria for pneumonia severity?',
+      'Summarise the key diagnostic criteria in this document',
+      'What are the dosing guidelines mentioned for this drug?'
+    ];
+
+    // Reset feed with empty state + suggestions
     const feed = document.getElementById('feed');
     feed.innerHTML = '';
     const empty = document.createElement('div');
     empty.className = 'chat-empty';
     empty.id = 'chat-empty';
+
+    const chips = suggestions.map(s =>
+      '<button class="suggestion-chip" onclick="fillAndSend(' + JSON.stringify(s) + ')">' + s + '</button>'
+    ).join('');
+
     empty.innerHTML =
-      '<div class="chat-empty-icon ' + cls + '" id="empty-icon"><i class="ti ' + icon + '" aria-hidden="true"></i></div>' +
+      '<div class="chat-empty-icon ' + cls + '"><i class="ti ' + icon + '" aria-hidden="true"></i></div>' +
       '<p class="chat-empty-name">' + name + '</p>' +
-      '<p class="chat-empty-hint">Ask a question to get started</p>';
+      '<p class="chat-empty-hint">Try one of these or ask your own</p>' +
+      '<div class="chat-suggestions">' + chips + '</div>';
     feed.appendChild(empty);
 
     document.getElementById('chat-status').textContent = 'Ready';
@@ -656,6 +700,13 @@
 
   function esc(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function fillAndSend(text) {
+    const ta = document.getElementById('q');
+    ta.value = text;
+    grow(ta);
+    ask();
   }
 
   async function ask() {
