@@ -616,10 +616,10 @@
       'What should I learn to break into machine learning?',
       'Best paying remote jobs for React developers?'
     ] : [
-      'What is the first-line treatment for septic shock?',
-      'What are the CURB-65 criteria for pneumonia severity?',
-      'Summarise the key diagnostic criteria in this document',
-      'What are the dosing guidelines mentioned for this drug?'
+      'What document is currently loaded?',
+      'Summarise the key points in this document',
+      'What are the main findings or conclusions?',
+      'List the most important terms or criteria mentioned'
     ];
 
     // Reset feed with empty state + suggestions
@@ -718,22 +718,38 @@
     setStatus('Thinking…');
     addUser(q);
     addTyping();
+
+    const DELAYS = [0, 8000, 15000]; // retry gaps: immediate, 8s, 15s
+    const STATUSES = ['Thinking…', 'Waking up services…', 'Still working…'];
     let data = null;
+
     for (let i = 0; i < 3; i++) {
+      setStatus(STATUSES[i]);
       try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 90000); // 90s timeout
         const r = await fetch(API + '/query', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query: q }),
+          signal: controller.signal,
         });
+        clearTimeout(timer);
         if (!r.ok) throw new Error(r.status);
         data = await r.json();
         break;
-      } catch {
-        if (i < 2) await new Promise(r => setTimeout(r, 10000));
-        else data = { source: src, answer: 'Could not reach the backend. It may be waking up — try again in a moment.' };
+      } catch (err) {
+        if (i < 2) {
+          await new Promise(r => setTimeout(r, DELAYS[i + 1]));
+        } else {
+          data = {
+            source: src,
+            answer: 'The backend is taking too long to respond. Both services run on Render free tier and can take up to 60 seconds to wake up. Please try again in a moment.'
+          };
+        }
       }
     }
+
     removeTyping();
     addAI(data);
     setStatus('Ready');
