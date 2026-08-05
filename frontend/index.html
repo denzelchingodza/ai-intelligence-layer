@@ -584,11 +584,6 @@
     // Send button color
     document.getElementById('btn').className = 'send-btn ' + cls;
 
-    // Empty state
-    document.getElementById('empty-icon').className = 'chat-empty-icon ' + cls;
-    document.getElementById('empty-i').className = 'ti ' + icon;
-    document.getElementById('empty-name').textContent = name;
-
     // Reset feed (keep empty state)
     const feed = document.getElementById('feed');
     feed.innerHTML = '';
