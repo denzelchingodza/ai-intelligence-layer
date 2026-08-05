@@ -7,14 +7,14 @@ from app.config import STACKSCOPE_API_URL, OPENAI_API_KEY
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 
-def _wake(url: str, retries: int = 6, interval: int = 10) -> bool:
+def _wake(url: str, retries: int = 4, interval: int = 5) -> bool:
     """
     Ping the health endpoint until it returns 200 or we run out of retries.
-    Gives Render's free tier up to ~60s to wake up before the real query.
+    Kept short (4×5s = 20s max) so we stay well within Render's 60s request timeout.
     """
     for _ in range(retries):
         try:
-            r = requests.get(url, timeout=8)
+            r = requests.get(url, timeout=6)
             if r.status_code == 200:
                 return True
         except Exception:
@@ -149,7 +149,7 @@ def query_stackscope(question: str) -> dict:
             answer = f"Top matching jobs: {result}"
 
         # Emerging / trending up
-        elif any(word in q for word in ["emerging", "growing", "rising", "up and coming"]):
+        elif any(word in q for word in ["emerging", "growing", "rising", "up and coming", "trending", "popular", "hot", "in demand"]):
             resp   = requests.get(f"{STACKSCOPE_API_URL}/api/trends/emerging", timeout=15)
             result = _parse(resp)
             # Fall back to frequency if trends need more historical data

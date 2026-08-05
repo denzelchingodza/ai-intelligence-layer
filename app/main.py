@@ -42,7 +42,7 @@ async def health():
 
 
 @app.post("/query")
-@limiter.limit("10/hour")
+@limiter.limit("60/hour")
 async def handle_query(request: Request, body: QueryRequest):
     try:
         return route(body.query)

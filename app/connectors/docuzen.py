@@ -3,11 +3,11 @@ import requests
 from app.config import DOCUZEN_API_URL
 
 
-def _wake(url: str, retries: int = 6, interval: int = 10) -> bool:
-    """Ping health until 200 or timeout — lets Render free tier wake up."""
+def _wake(url: str, retries: int = 4, interval: int = 5) -> bool:
+    """Ping health until 200 or timeout — kept short (20s max) to stay within Render's 60s limit."""
     for _ in range(retries):
         try:
-            r = requests.get(url, timeout=8)
+            r = requests.get(url, timeout=6)
             if r.status_code == 200:
                 return True
         except Exception:
