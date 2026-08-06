@@ -1,0 +1,27 @@
+# AI Intelligence Layer
+
+A natural language interface sitting on top of multiple personal developer projects.
+
+## What it does
+
+Takes a plain English question, uses GPT-4o-mini to classify intent, routes the query to the appropriate connector (StackScope for job market data, ChunkDoc for document analysis), and returns a readable plain text answer.
+
+## How it works
+
+1. User submits a question via the frontend
+2. GPT-4o-mini classifies intent and selects the right connector
+3. The connector calls the relevant internal API
+4. The answer is returned as readable text
+
+## Stack
+
+- Backend: FastAPI, Python, OpenAI GPT-4o-mini
+- Deployment: Render (API), Vercel (frontend)
+
+## Live
+
+https://ai-intelligence-layer.vercel.app
+
+## Author
+
+Denzel Chingodza — denzel.chingodza@icloud.com
