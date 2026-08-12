@@ -35,6 +35,9 @@
       --green:        #3dba6e;
       --green-bg:     rgba(61,186,110,0.1);
       --green-border: rgba(61,186,110,0.28);
+      --amber:        #f59e0b;
+      --amber-bg:     rgba(245,158,11,0.1);
+      --amber-border: rgba(245,158,11,0.28);
     }
 
     body {
@@ -61,7 +64,7 @@
     }
     .cards-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 16px;
       flex: 1;
     }
@@ -102,6 +105,7 @@
     .card-icon-wrap i { font-size: 21px; }
     .card-icon-wrap.blue  { background: var(--blue-bg);  color: var(--blue); }
     .card-icon-wrap.green { background: var(--green-bg); color: var(--green); }
+    .card-icon-wrap.amber { background: var(--amber-bg); color: var(--amber); }
 
     .card-meta-name {
       font-size: 16px;
@@ -134,6 +138,7 @@
     .feat-icon { font-size: 14px; flex-shrink: 0; }
     .feat-icon.blue  { color: rgba(79,142,247,0.6); }
     .feat-icon.green { color: rgba(61,186,110,0.6); }
+    .feat-icon.amber { color: rgba(245,158,11,0.6); }
 
     /* Card button */
     .card-cta {
@@ -155,8 +160,10 @@
     .card-cta i { font-size: 14px; }
     .card-cta.blue  { color: var(--blue);  border: 1px solid var(--blue-border);  }
     .card-cta.green { color: var(--green); border: 1px solid var(--green-border); }
+    .card-cta.amber { color: var(--amber); border: 1px solid var(--amber-border); }
     .card-cta.blue:hover  { background: var(--blue-bg); }
     .card-cta.green:hover { background: var(--green-bg); }
+    .card-cta.amber:hover { background: var(--amber-bg); }
 
     /* Footer */
     .site-footer {
@@ -275,6 +282,7 @@
     .topbar-icon i { font-size: 14px; }
     .topbar-icon.blue  { background: var(--blue-bg);  color: var(--blue); }
     .topbar-icon.green { background: var(--green-bg); color: var(--green); }
+    .topbar-icon.amber { background: var(--amber-bg); color: var(--amber); }
 
     #chat-src {
       font-size: 14px;
@@ -282,6 +290,7 @@
     }
     #chat-src.blue  { color: var(--blue); }
     #chat-src.green { color: var(--green); }
+    #chat-src.amber { color: var(--amber); }
 
     #chat-status {
       margin-left: auto;
@@ -309,6 +318,7 @@
     .chat-empty-icon i { font-size: 24px; }
     .chat-empty-icon.blue  { background: var(--blue-bg);  color: var(--blue); }
     .chat-empty-icon.green { background: var(--green-bg); color: var(--green); }
+    .chat-empty-icon.amber { background: var(--amber-bg); color: var(--amber); }
     .chat-empty-name {
       font-size: 16px;
       font-weight: 600;
@@ -388,6 +398,7 @@
     }
     .ai-src.blue  { color: var(--blue); }
     .ai-src.green { color: var(--green); }
+    .ai-src.amber { color: var(--amber); }
     .ai-src.dim   { color: var(--faint); }
     .ai-text {
       font-size: 14px;
@@ -455,12 +466,13 @@
     }
     .send-btn.blue  { background: var(--blue); }
     .send-btn.green { background: var(--green); }
+    .send-btn.amber { background: var(--amber); }
     .send-btn:disabled { opacity: .3; cursor: default; }
     .send-btn i { font-size: 14px; color: #fff; }
 
     @media (max-width: 600px) {
       .top-nav, .hero, .cards-wrap, .site-footer { padding-left: 20px; padding-right: 20px; }
-      .cards-grid { grid-template-columns: 1fr; }
+      .cards-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
       .footer-stack { display: none; }
       .chat-topbar, .chat-input-area { padding-left: 20px; padding-right: 20px; }
       .msg-row { padding: 0 20px; }
@@ -517,6 +529,28 @@
         </ul>
         <button class="card-cta green">
           Open ChunkDoc <i class="ti ti-arrow-right" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <!-- Muzezuru -->
+      <div class="app-card" onclick="openApp('muzezuru')">
+        <div class="card-header">
+          <div class="card-icon-wrap amber">
+            <i class="ti ti-language" aria-hidden="true"></i>
+          </div>
+          <div>
+            <div class="card-meta-name">Muzezuru</div>
+            <div class="card-meta-tag">Shona-language AI</div>
+          </div>
+        </div>
+        <ul class="card-features">
+          <li><i class="ti ti-message-circle feat-icon amber" aria-hidden="true"></i>Converse in Shona</li>
+          <li><i class="ti ti-brain feat-icon amber" aria-hidden="true"></i>Fine-tuned BLOOMZ-3B with QLoRA</li>
+          <li><i class="ti ti-world feat-icon amber" aria-hidden="true"></i>Low-resource language AI</li>
+          <li><i class="ti ti-alert-triangle feat-icon amber" aria-hidden="true"></i>Honest evaluation built in</li>
+        </ul>
+        <button class="card-cta amber">
+          Open Muzezuru <i class="ti ti-arrow-right" aria-hidden="true"></i>
         </button>
       </div>
 
@@ -607,10 +641,12 @@
 
   function openApp(source) {
     src = source;
-    const isS = source === 'stackscope';
-    const cls  = isS ? 'blue' : 'green';
-    const icon = isS ? 'ti-chart-bar' : 'ti-notes';
-    const name = isS ? 'StackScope' : 'ChunkDoc';
+    const isS   = source === 'stackscope';
+    const isC   = source === 'chunkdoc';
+    const isMuz = source === 'muzezuru';
+    const cls   = isS ? 'blue' : isC ? 'green' : 'amber';
+    const icon  = isS ? 'ti-chart-bar' : isC ? 'ti-notes' : 'ti-language';
+    const name  = isS ? 'StackScope' : isC ? 'ChunkDoc' : 'Muzezuru';
 
     // Topbar
     const srcEl = document.getElementById('chat-src');
@@ -628,11 +664,16 @@
       'Salary range for a senior Python and AWS developer?',
       'What should I learn to break into machine learning?',
       'Best paying remote jobs for React developers?'
-    ] : [
+    ] : isC ? [
       'What document is currently loaded?',
       'Summarise the key points in this document',
       'What are the main findings or conclusions?',
       'List the most important terms or criteria mentioned'
+    ] : [
+      'Mhoro, uri sei nhasi?',
+      'Ndiudze nezveZimbabwe.',
+      'Chii chinonzi machine learning?',
+      'Nyora rondedzero pfupi yeChechi yeZimbabwe.'
     ];
 
     // Reset feed with empty state + suggestions
@@ -720,11 +761,12 @@
   }
 
   function addAI(data) {
-    const s = (data.source || src).toLowerCase();
+    const s   = (data.source || src).toLowerCase();
     const isS = s === 'stackscope';
     const isC = s === 'chunkdoc' || s === 'docuzen';
-    const cls = isS ? 'blue' : isC ? 'green' : 'dim';
-    const lbl = isS ? 'StackScope' : isC ? 'ChunkDoc' : 'Intelligence Layer';
+    const isMuz = s === 'muzezuru';
+    const cls = isS ? 'blue' : isC ? 'green' : isMuz ? 'amber' : 'dim';
+    const lbl = isS ? 'StackScope' : isC ? 'ChunkDoc' : isMuz ? 'Muzezuru' : 'Intelligence Layer';
     addRow('<div class="msg-ai"><span class="ai-src ' + cls + '">' + lbl + '</span><p class="ai-text">' + esc(data.answer || 'No response.') + '</p></div>');
   }
 

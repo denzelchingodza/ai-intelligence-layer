@@ -6,3 +6,6 @@ DOCUZEN_API_URL    = os.getenv("DOCUZEN_API_URL", "")
 
 OPENAI_API_KEY  = os.getenv("OPENAI_API_KEY", "")
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*")
+
+# Hugging Face — used by Muzezuru connector
+HF_API_TOKEN = os.getenv("HF_API_TOKEN", "")
